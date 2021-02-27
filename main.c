@@ -3,14 +3,15 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include "arc.c"
-#include "unarc.c"
+
+#include "header.h"
 
 int main(int argc, char *argv[])
 {
     if (argc != 4)
     {
-        printf("Wrong number of arguments!");
+        printf("Wrong number of arguments!\n");
+        return 1;
     }
     if (strcmp(argv[1], "-a") == 0) {
         arc(argv[2], argv[3], 0);
@@ -18,8 +19,9 @@ int main(int argc, char *argv[])
     if (strcmp(argv[1], "-u") == 0) {
         unarc(argv[2], argv[3], 0);
     }
-    if (strcmp(argv[1], "-u") != 0 || (strcmp(argv[1], "-a") != 0)) {
-        printf("Wrong argument! Need -a or -u.");
+    if (strcmp(argv[1], "-u") != 0 && (strcmp(argv[1], "-a") != 0)) {
+        printf("Wrong argument! Need -a or -u.\n");
+        return 2;
     }
     return 0;
 }
