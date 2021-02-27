@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "header.h"
 
 //#define MAX_NAME_LENGTH = 100
 //#define BLOCK_SIZE = 512
@@ -20,7 +21,7 @@ int add_to_arc(char *temp_name, int arc_file, int depth, char *d_name) {
     int temp_file = open(temp_name, O_RDONLY);
     if (temp_file == -1) {
         printf("Can't open file");
-        return 1;
+        return 1488;
     } 
     lstat(temp_name, &stats);
     size = stats.st_size;
@@ -54,18 +55,18 @@ int add_to_arc(char *temp_name, int arc_file, int depth, char *d_name) {
 
 int arc(char *filename, char *dirname, char depth) {
 
-    int arc_file = open(filename, O_WRONLY); //создаём файл для архива
+    int arc_file = open(filename, O_CREAT | O_WRONLY, 00666); //создаём файл для архива
     if (arc_file == -1) {
-        printf("Can't create file!");
-        return 1;
+        printf("Can't create file!!\n");
+        return 322;
     }
 
     DIR *dir = opendir(dirname);    //открываем каталог и формируем его поток
     if (dir == NULL) {
-        printf("Can't open directory!");
+        printf("Can't open directory!\n");
         return 2;
     }
-    chdir(dir);                 //Переходим в директорию
+    chdir(dirname);                 //Переходим в директорию
 
     struct dirent *read_dir;
     struct stat statbuf;
@@ -79,7 +80,6 @@ int arc(char *filename, char *dirname, char depth) {
             add_to_arc(".tempttar", arc_file, depth+1, read_dir->d_name);
             remove(".tempttar");
         }
-	//Блок з
         else add_to_arc(read_dir->d_name, arc_file, depth, "");
         read_dir = readdir(dir);
     }
