@@ -6,30 +6,31 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "header.h"
-//#define MAX_NAME_LENGTH = 100
-//#define BLOCK_SIZE = 512
-//#define PERMISSION = 00666
+
+#define MAX_NAME_LENGTH 100
+#define BLOCK_SIZE 512
+#define PERMISSION 00666
 
 
 int unpack_file(int i_file, unsigned long i_size, char *true_name)
 {
-	char i_block[512];
-	int n_file = open(true_name, O_CREAT|O_WRONLY, 00666);	//Создание файла
+	char i_block[BLOCK_SIZE];
+	int n_file = open(true_name, O_CREAT|O_WRONLY, PERMISSION);	//Создание файла
 	if (n_file == -1)
 		printf("ERROOOOOR");
 	printf("Распаковка %s\n", true_name);
 	//Заполнение файла
 	for (int i = 0; i < i_size; ) {
 		//Считываем блок
-		int count = read(i_file, i_block, 512);
+		int count = read(i_file, i_block, BLOCK_SIZE);
 		printf("%i/%lu - \n", i, i_size);
 		//Записываем блок
-		if ((i + 512) > i_size) {
+		if ((i + BLOCK_SIZE) > i_size) {
 			write(n_file, i_block, i_size-i);	//Дописываем файл
 			break;
 		} else {
-			write(n_file, i_block, 512);
-			i += 512;
+			write(n_file, i_block, BLOCK_SIZE);
+			i += BLOCK_SIZE;
 		}
 	}
 	close(n_file);
@@ -60,12 +61,12 @@ int unarc(char *fname, char *dir, int depth)	//Распаковывает арх
 	//Начинаем распаковывать файлы
 	unsigned long i_size;
 	int i_depth;
-	char i_name[100];
+	char i_name[MAX_NAME_LENGTH];
 	char a;
-	while (read(i_file, i_name, 100) == 100) {
+	while (read(i_file, i_name, MAX_NAME_LENGTH) == MAX_NAME_LENGTH) {
 		read(i_file, &i_size, sizeof(long));	//Считывание размера файла
 		read(i_file, &i_depth, sizeof(int));	//Считывание глубины залегания файла
-		for (int i = 0; i < 512 - 100 - sizeof(int) - sizeof(long); i++) {
+		for (int i = 0; i < BLOCK_SIZE - MAX_NAME_LENGTH - sizeof(int) - sizeof(long); i++) {
 			read(i_file, &a, 1);	//Считывание заголовочного блока полностью
 		}
 		//Проверяем, является ли считанный файл собственно файлом или архивом (т.е. вложенной папкой)
